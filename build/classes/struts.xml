@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+"http://struts.apache.org/dtds/struts-2.0.dtd">
+ 
+<struts>
+	<!-- SET STRUTS2 FRAMEWORK CONSTANTS -->
+	<constant name="struts.devMode" value="false" />
+	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
+    <constant name="struts.multipart.saveDir" value="E:/HSDH/Temp" />
+	<constant name="struts.multipart.maxSize" value="30000000" />
+	<constant name="struts.custom.i18n.resources" value="global" />
+	
+	<package name="default" extends="struts-default">
+		<!-- GROUP INTERCEPTORS IN ONE STACK AND REFERENCE IT VIA ITS NAME WHEN NEEDED IN AN ACTION -->
+		<interceptors>          
+  			<interceptor name="execAndWaitExtended" 
+  						class="com.dpc.workbench.config.CustomExecuteAndWaitInterceptor">
+  			</interceptor>
+			<interceptor-stack name="newStack">
+			<interceptor-ref name="fileUpload">
+    	    	<param name="allowedTypes">text/plain,
+    	    							   text/anytext,
+    	    							   text/csv,
+    	    							   text/comma-separated-values,
+    	    							   application/txt,
+    	    							   application/csv,
+    	    							   application/excel,
+    	    							   application/vnd.ms-excel,
+								           application/vnd.msexcel,
+								           application/msexcel,
+            							   application/xls,
+<!--             							   application/x-msexcel, -->
+<!--             							   application/x-ms-excel, -->
+<!--             							   application/x-excel, -->
+<!--             							   application/x-dos_ms_excel, -->
+<!--             							   application/x-xls, -->
+            	</param>
+            	<param name="allowedExtensions">csv</param>
+			</interceptor-ref>
+			<interceptor-ref name="basicStack"></interceptor-ref>
+			<interceptor-ref name="defaultStack"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<interceptor-ref name="execAndWaitExtended">
+				<param name="delaySleepInterval">500</param>
+			</interceptor-ref>
+    		</interceptor-stack>
+		</interceptors>
+
+		<!-- ACTION TO PERFORM BOE LOGIN -->
+		<action name="login" class="com.dpc.workbench.action.LoginUserAction">
+<!--		<result name="success">fileUpload.jsp</result> -->
+			<result name="success" type="chain">loadList</result>
+			<result name="error">error.jsp</result>
+		</action>
+
+		<!-- ACTION TO POPULATE SCREEN DROPDOWNS ACCORDING TO THE GROUP THE USER BELONGS TO -->
+        <action name="loadList" class="com.dpc.workbench.action.FileUploadAction" method="loadData">
+        	<result>fileUpload.jsp</result>
+        </action>
+        	 
+		<!-- ACTION TO UPLOAD FILE AND SAVE DATA TO THE DB -->
+		<action name="upload" class="com.dpc.workbench.action.FileUploadAction">
+			<interceptor-ref name="newStack"></interceptor-ref>
+<!--		<result name="success">success.jsp</result> -->
+			<result name="success" type="chain">etlValidation</result>
+			<result name="input">fileUpload.jsp</result>
+			<result name="wait">pleaseWait.jsp</result>
+		</action>
+
+		<!-- ACTION TO RUN ETL VALIDATION JOB VIA BATCH FILE EXECUTION -->
+        <action name="etlValidation" class="com.dpc.workbench.action.EtlValidationAction">
+        	<interceptor-ref name="newStack"></interceptor-ref>
+        	<result name="success">success.jsp</result>
+        	<result name="redirect" type="redirect">${url}</result>
+			<result name="error">error.jsp</result>
+        	<result name="wait">pleaseWait2.jsp</result>
+        </action>
+	</package>
+</struts>

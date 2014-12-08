@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<!-- Database connection settings -->
+		<property name="connection.driver_class">
+			com.sybase.jdbc4.jdbc.SybDriver
+		</property>
+		
+		<property name="connection.url">
+		<!-- Prod Server -->
+<!--  			jdbc:sybase:Tds:10.215.104.11:1121?ServiceName=ETL_FRAMEWORK_P -->
+		<!-- Dev Server -->
+			jdbc:sybase:Tds:10.215.104.12:1115?ServiceName=ETL_FRAMEWORK
+		</property>
+		
+		<property name="connection.username">DBA</property>
+		<property name="connection.password">sql</property>
+
+		<!-- JDBC connection pool (use the built-in) -->
+		<property name="connection.pool_size">1</property>
+
+		<!-- SQL dialect -->
+		<property name="dialect">
+			org.hibernate.dialect.SybaseDialect
+		</property>
+
+		<!-- Enable Hibernate's automatic session context management -->
+		<property name="current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
+		
+		<!-- Disable the second-level cache  -->
+		<property name="cache.provider_class">
+			org.hibernate.cache.NoCacheProvider
+		</property>
+
+		<!-- Echo all executed SQL to stdout -->
+		<property name="show_sql">true</property>
+
+		<!-- Drop and re-create the database schema on startup -->
+		<property name="hbm2ddl.auto">update</property>
+
+		<!-- Table mappings -->
+		<mapping class="com.dpc.workbench.model.LogEvent" />
+	</session-factory>
+</hibernate-configuration>
